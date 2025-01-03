@@ -1,75 +1,74 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 import { SanityImageCrop } from "@sanity/image-url/lib/types/types";
 import Image from "next/image";
+import Link from "next/link";
+import { FaCommentDots, FaEye } from "react-icons/fa";
 
 async function getData() {
   const fetchData = await client.fetch(`*[_type == 'blog']`);
   return fetchData;
 }
+
 export default async function BlogCard() {
   interface Blog {
-    Image: SanityImageCrop; // Sanity Image type
+    _id: string; // Use `_id` from Sanity for routing
+    Image: SanityImageCrop;
     title: string;
-    blog: string;
     publishedAt: string;
     author: string;
+    views: number;
+    comments: number;
   }
+
   const data = await getData();
-  console.log(data);
 
   return (
-    <>
-      <div className="flex flex-wrap justify-around lg:m-20 md:m-10 sm:m2">
-        {data.map((val: Blog, i: number) => {
-          const imageUrl = urlFor(val.Image).width(200).height(200).url(); // Sanity image URL with width and height
+    <div className="flex flex-wrap justify-around lg:m-20 md:m-10 sm:m-2">
+      {data.map((val: Blog, i: number) => {
+        const imageUrl = urlFor(val.Image).width(200).height(200).url();
 
-          return (
-            <div key={i} className="flex">
-              <Card>
-                <CardHeader>
-                <Image
-  src={imageUrl}
-  alt={val.title}
-  width={200} // Specify width
-  height={100} // Specify height
-  className="rounded-lg" // Optional styling
-  style={{ objectFit: "cover" }} // Ensures the image covers the container
-/>
-
-                </CardHeader>
-
-                <CardContent>
-                  <p>
-                    <span className="text-gray-600">Title: </span>
-                    {val.title}
+        return (
+          <div key={i} className="flex flex-col w-full max-w-xs mx-auto my-6">
+            <Link href={`/blogs/${val._id}`}> {/* Use `_id` for dynamic routing */}
+              <div className="shadow-xl transition-transform transform hover:scale-105 duration-300 ease-in-out">
+                <div className="relative">
+                  <Image
+                    src={imageUrl}
+                    alt={val.title}
+                    width={400}
+                    height={250}
+                    className="rounded-t-lg w-full object-cover"
+                  />
+                </div>
+                <div className="p-6 space-y-4 bg-white rounded-b-lg">
+                  <p className="text-gray-600 text-sm">
+                    <span className="font-medium">Published On:</span> {val.publishedAt}
                   </p>
-                  <p>
-                    <span className="text-gray-600">Published At: </span>{" "}
-                    {val.publishedAt}
+                  <p className="text-gray-600 text-sm">
+                    <span className="font-medium">Author:</span> {val.author}
                   </p>
-                  <p>
-                    <span className="text-gray-600">Author: </span>
-                    {val.author}
-                  </p>
-                  <div className="flex justify-center items-start mt-6">
-                    <Button>
-                      <a href="/blogContent">Read Blog</a>
-                    </Button>
+                  <div className="flex justify-center mt-6">
+                    <button className="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors">
+                      Read Full Blog
+                    </button>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-          );
-        })}
-      </div>
-      <div className="flex justify-center items-center mt-10 mb-12">
-        <button className="border w-40 border-x-gray-500 p-2 rounded-sm hover:bg-gray-400 lg:mb-20">
-          <a href="/blogContent">Read All Blogs</a>
-        </button>
-      </div>
-    </>
+                  <div className="flex space-x-4 mt-4 justify-between">
+                    <div className="flex items-center text-gray-500">
+                      <FaEye className="mr-1" />
+                      <span>{val.views} 1.9K</span>
+                    </div>
+                    <div className="flex items-center text-gray-500">
+                      <FaCommentDots className="mr-1" />
+                      <span><Link href={"/comment"}>{val.comments}</Link> 1K</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </div>
+        );
+      })}
+    </div>
   );
 }

@@ -4,7 +4,7 @@ export default function Navbar(){
           <a className="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0">
             <span className="ml-3 text-xl">Blogging</span>
           </a>
-          <nav className="md:ml-auto md:mr-auto flex flex-wrap items-center text-base justify-center">
+          <nav className="md:ml-auto md:mr-auto flex flex-wrap items-center text-base justify-center cursor-pointer">
             <a className="mr-5 hover:text-gray-900">Home</a>
             <a className="mr-5 hover:text-gray-900" href="/blogContent">About</a>
             <a className="mr-5 hover:text-gray-900">Blogs</a>
