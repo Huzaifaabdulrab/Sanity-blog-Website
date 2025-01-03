@@ -8,76 +8,38 @@ interface CommentData {
 }
 
 export default function Comment() {
-  // Load comments from local storage or use default if not available
-  const loadComments = () => {
-    const storedComments = localStorage.getItem("comments");
-    return storedComments
-      ? JSON.parse(storedComments)
-    : [
-          {
-            id: 1,
-            name: "Ali Ahmed",
-            comment: "Great website! Really enjoyed the experience.",
-          },
-          {
-            id: 2,
-            name: "Sara Khan",
-            comment: "Love the design and ease of use. Keep it up!",
-          },
-          {
-            id: 3,
-            name: "Usman Qureshi",
-            comment:
-              "The content is really helpful, but I think the speed could be improved.",
-          },
-          {
-            id: 4,
-            name: "Hina Shaikh",
-            comment: "Fantastic service! I would highly recommend it.",
-          },
-          {
-            id: 5,
-            name: "Omar Farooq",
-            comment: "Great features, but some links are broken.",
-          },
-          {
-            id: 6,
-            name: "Fatima Ali",
-            comment: "User-friendly interface and smooth navigation.",
-          },
-          {
-            id: 7,
-            name: "Zainab Ahmed",
-            comment:
-              "I love the colors and layout, but the page load time can be faster.",
-          },
-          {
-            id: 8,
-            name: "Ahmad Bilal",
-            comment: "Overall a good experience. Looking forward to updates.",
-          },
-          {
-            id: 9,
-            name: "Rehman Shah",
-            comment: "Nice platform! Some more tutorials would be great.",
-          },
-          {
-            id: 10,
-            name: "Maira Tariq",
-            comment:
-              "Love the website, but I hope the search function is improved.",
-          },
-        ];
-  };
-
-  const [comments, setComments] = useState<CommentData[]>(loadComments);
+  const [comments, setComments] = useState<CommentData[]>([]);
   const [name, setName] = useState("");
   const [userComment, setUserComment] = useState("");
+  const [isClient, setIsClient] = useState(false);
 
-  // Update local storage whenever comments change
   useEffect(() => {
-    localStorage.setItem("comments", JSON.stringify(comments));
-  }, [comments]);
+    // Ensure this runs only on the client side
+    setIsClient(true);
+    const storedComments = localStorage.getItem("comments");
+    setComments(
+      storedComments
+        ? JSON.parse(storedComments)
+        : [
+            {
+              id: 1,
+              name: "Ali Ahmed",
+              comment: "Great website! Really enjoyed the experience.",
+            },
+            {
+              id: 2,
+              name: "Sara Khan",
+              comment: "Love the design and ease of use. Keep it up!",
+            },
+          ]
+    );
+  }, []);
+
+  useEffect(() => {
+    if (isClient) {
+      localStorage.setItem("comments", JSON.stringify(comments));
+    }
+  }, [comments, isClient]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,9 +56,8 @@ export default function Comment() {
   };
 
   return (
-    <>
-      <div className="bg-gray-50 w-[30rem] ml-auto mr-auto mb-20 shadow-2xl mt-20 ">
-      <div className="  w-[30rem] bg-white p-4  rounded-md shadow-lg">
+    <div className="bg-gray-50 lg:w-[30rem]  w-auto ml-auto mr-auto mb-20 shadow-2xl mt-20">
+      <div className="lg:w-[30rem] w-auto bg-white p-4 rounded-md shadow-lg">
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <input
@@ -123,19 +84,12 @@ export default function Comment() {
           </button>
         </form>
       </div>
-
-        {comments.map((comment) => (
-          <div
-            key={comment.id}
-            className=" p-4 mt-4 rounded-md shadow-sm"
-          >
-            <h3 className="font-semibold">{comment.name}</h3>
-            <p>{comment.comment}</p>
-
-          </div>
-        ))}
-
-      </div>
-    </>
+      {comments.map((comment) => (
+        <div key={comment.id} className="p-4 mt-4 rounded-md shadow-sm">
+          <h3 className="font-semibold">{comment.name}</h3>
+          <p>{comment.comment}</p>
+        </div>
+      ))}
+    </div>
   );
 }
